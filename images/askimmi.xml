@@ -1,0 +1,97 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36" version="29.2.7">
+  <diagram id="askimmigration-arch-v2" name="AskImmigration Architecture (RAG + Hybrid + Corpus)">
+    <mxGraphModel dx="1267" dy="565" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=20;fontStyle=1;" value="AskImmigration: Retrieval-Augmented QA (Hybrid Retrieval + Verification)" vertex="1">
+          <mxGeometry height="40" width="1020" x="350" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="user" parent="1" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;fillColor=#f3f4f6;strokeColor=#6b7280;fontSize=12;" value="User / Browser&#xa;UI (Local FastAPI page)&#xa;&#xa;Enters question" vertex="1">
+          <mxGeometry height="110" width="190" x="70" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="fastapi" parent="1" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;fillColor=#dbeafe;strokeColor=#2563eb;fontSize=12;" value="FastAPI Server (Uvicorn)&#xa;&#xa;GET /&#xa;POST /ask" vertex="1">
+          <mxGeometry height="110" width="210" x="290" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="rag" parent="1" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;fillColor=#ede9fe;strokeColor=#7c3aed;fontSize=12;" value="RAG Orchestrator (llama-index)&#xa;&#xa;• prompt + context assembly&#xa;• citation formatting&#xa;• routing to retrievers" vertex="1">
+          <mxGeometry height="150" width="260" x="530" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="corpus" parent="1" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;fillColor=#ffffff;strokeColor=#111827;fontSize=12;" value="Corpus &amp; Indexing Pipeline&#xa;&#xa;Sources: USCIS / DHS / official docs (PDF/HTML)&#xa;↓ cleaning + dedup&#xa;↓ chunking (size/overlap)&#xa;↓ metadata (url, title, section)&#xa;&#xa;Outputs: BM25 index + FAISS vectors" vertex="1">
+          <mxGeometry height="190" width="430" x="1210" y="109" as="geometry" />
+        </mxCell>
+        <mxCell id="retriever_layer" parent="1" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;fillColor=#ede9fe;strokeColor=#7c3aed;fontSize=12;fontStyle=1;align=center;" value="" vertex="1">
+          <mxGeometry height="471" width="340" x="840" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="bm25" parent="1" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;fillColor=#e5e7eb;strokeColor=#374151;fontSize=12;" value="BM25 Retriever&#xa;&#xa;Lexical matching" vertex="1">
+          <mxGeometry height="80" width="310" x="855" y="129" as="geometry" />
+        </mxCell>
+        <mxCell id="bqgrxjMXMntMyIKXp4NV-4" edge="1" parent="1" source="dense" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.25;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" target="gemini">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dense" parent="1" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;fillColor=#e5e7eb;strokeColor=#374151;fontSize=12;" value="Dense Retriever (FAISS)&#xa;&#xa;Embeddings → nearest neighbors" vertex="1">
+          <mxGeometry height="80" width="310" x="855" y="219" as="geometry" />
+        </mxCell>
+        <mxCell id="hybrid" parent="1" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;fillColor=#e5e7eb;strokeColor=#374151;fontSize=12;" value="Hybrid Retriever (Fusion)&#xa;&#xa;Score fusion: BM25 + Dense&#xa;Top-k merge" vertex="1">
+          <mxGeometry height="85" width="310" x="855" y="342.5" as="geometry" />
+        </mxCell>
+        <mxCell id="rerank" parent="1" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;fillColor=#fff7ed;strokeColor=#ea580c;fontSize=12;" value="Reranker / Filter&lt;br&gt;&lt;br&gt;• cross-encoder&lt;br&gt;• remove duplicates / low-quality chunks" vertex="1">
+          <mxGeometry height="80" width="310" x="850" y="460" as="geometry" />
+        </mxCell>
+        <mxCell id="gemini" parent="1" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;fillColor=#dcfce7;strokeColor=#16a34a;fontSize=12;" value="Gemini API (LLM)&#xa;&#xa;Grounded answer generation&#xa;(uses retrieved contexts)" vertex="1">
+          <mxGeometry height="120" width="260" x="530" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="verify" parent="1" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;fillColor=#ffedd5;strokeColor=#ea580c;fontSize=12;" value="Verification (NLI / Entailment)&#xa;&#xa;Outputs: verification_score&#xa;Used to flag low-confidence answers" vertex="1">
+          <mxGeometry height="110" width="210" x="290" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="output" parent="1" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;fillColor=#f3f4f6;strokeColor=#6b7280;fontSize=12;" value="Response&#xa;&#xa;answer&#xa;sources (URLs)&#xa;verification_score" vertex="1">
+          <mxGeometry height="110" width="190" x="70" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="eval" parent="1" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;dashed=1;dashPattern=6 4;fillColor=#ffffff;strokeColor=#111827;fontSize=12;" value="Evaluation Harness&#xa;&#xa;eval.jsonl (questions + references/labels)&#xa;eval_retrievers.py&#xa;&#xa;• compare BM25 vs Dense vs Hybrid&#xa;• metrics + error analysis outputs" vertex="1">
+          <mxGeometry height="190" width="600" x="90" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="1" source="user" style="endArrow=block;html=1;strokeWidth=2;" target="fastapi">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="fastapi" style="endArrow=block;html=1;strokeWidth=2;" target="rag">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" edge="1" parent="1" source="hybrid" style="endArrow=block;html=1;strokeWidth=2;" target="rerank">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" edge="1" parent="1" source="rerank" style="endArrow=block;html=1;strokeWidth=2;" target="gemini">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e10" edge="1" parent="1" source="gemini" style="endArrow=block;html=1;strokeWidth=2;" target="verify">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e11" edge="1" parent="1" source="verify" style="endArrow=block;html=1;strokeWidth=2;" target="output">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e12" edge="1" parent="1" source="output" style="endArrow=block;html=1;strokeWidth=2;curved=1;" target="user">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e13" edge="1" parent="1" source="corpus" style="endArrow=block;html=1;strokeWidth=2;dashed=1;dashPattern=6 4;" target="bm25">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e14" edge="1" parent="1" source="corpus" style="endArrow=block;html=1;strokeWidth=2;dashed=1;dashPattern=6 4;" target="dense">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e15" edge="1" parent="1" source="eval" style="endArrow=block;html=1;strokeWidth=2;dashed=1;dashPattern=6 4;" target="rag">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e16" edge="1" parent="1" source="eval" style="endArrow=block;html=1;strokeWidth=2;dashed=1;dashPattern=6 4;" target="output">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="bqgrxjMXMntMyIKXp4NV-2" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Retriever Layer" vertex="1">
+          <mxGeometry height="30" width="60" x="975" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="bqgrxjMXMntMyIKXp4NV-3" edge="1" parent="1" source="rag" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.01;entryY=0.225;entryDx=0;entryDy=0;entryPerimeter=0;fontSize=12;startSize=8;endSize=8;" target="retriever_layer">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="bqgrxjMXMntMyIKXp4NV-5" edge="1" parent="1" source="bm25" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=0.962;entryY=0.083;entryDx=0;entryDy=0;entryPerimeter=0;fontSize=12;startSize=8;endSize=8;" target="gemini">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
